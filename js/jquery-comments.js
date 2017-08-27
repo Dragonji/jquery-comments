@@ -33,7 +33,7 @@
     }
 }(function ($) {
 
-    var Comments = {
+    let Comments = {
 
         // Instance variables
         // ==================
@@ -271,15 +271,15 @@
         },
 
         bindEvents: function (unbind) {
-            var bindFunction = unbind ? 'off' : 'on';
-            for (var key in this.events) {
-                var eventName = key.split(' ')[0];
-                var selector = key.split(' ').slice(1).join(' ');
-                var methodNames = this.events[key].split(' ');
+            let bindFunction = unbind ? 'off' : 'on';
+            for (let key in this.events) {
+                let eventName = key.split(' ')[0];
+                let selector = key.split(' ').slice(1).join(' ');
+                let methodNames = this.events[key].split(' ');
 
-                for (var index in methodNames) {
+                for (let index in methodNames) {
                     if (methodNames.hasOwnProperty(index)) {
-                        var method = this[methodNames[index]];
+                        let method = this[methodNames[index]];
 
                         // Keep the context
                         method = $.proxy(method, this);
@@ -299,7 +299,7 @@
         // =====================
 
         fetchDataAndRender: function () {
-            var self = this;
+            const self = this;
 
             this.commentsById = {};
             this.usersById = {};
@@ -308,7 +308,7 @@
             this.createHTML();
 
             // Render after data has been fetched
-            var dataFetched = this.after(this.options.enablePinging ? 2 : 1, function () {
+            let dataFetched = this.after(this.options.enablePinging ? 2 : 1, function () {
                 self.dataFetched = true;
                 self.render();
             });
@@ -316,9 +316,9 @@
             // Comments
             // ========
 
-            var commentsFetched = function (commentsArray) {
+            let commentsFetched = function (commentsArray) {
                 // Convert comments to custom data model
-                var commentModels = commentsArray.map(function (commentsJSON) {
+                let commentModels = commentsArray.map(function (commentsJSON) {
                     return self.createCommentModel(commentsJSON)
                 });
 
@@ -338,7 +338,7 @@
             // =====
 
             if (this.options.enablePinging) {
-                var usersFetched = function (userArray) {
+                let usersFetched = function (userArray) {
                     $(userArray).each(function (index, user) {
                         self.usersById[user.id] = user;
                     });
@@ -350,20 +350,20 @@
         },
 
         fetchNext: function () {
-            var self = this;
+            const self = this;
 
             // Loading indicator
-            var spinner = this.createSpinner();
+            let spinner = this.createSpinner();
             this.$el.find('ul#comment-list').append(spinner);
 
-            var success = function (commentModels) {
+            let success = function (commentModels) {
                 $(commentModels).each(function (index, commentModel) {
                     self.createComment(commentModel);
                 });
                 spinner.remove();
             }
 
-            var error = function () {
+            let error = function () {
                 spinner.remove();
             }
 
@@ -371,7 +371,7 @@
         },
 
         createCommentModel: function (commentJSON) {
-            var commentModel = this.applyInternalMappings(commentJSON);
+            let commentModel = this.applyInternalMappings(commentJSON);
             commentModel.childs = [];
             return commentModel;
         },
@@ -382,7 +382,7 @@
 
                 // Update child array of the parent (append childs to the array of outer most parent)
                 if (commentModel.parent) {
-                    var outermostParent = this.getOutermostParent(commentModel.parent);
+                    let outermostParent = this.getOutermostParent(commentModel.parent);
                     outermostParent.childs.push(commentModel.id);
                 }
             }
@@ -393,7 +393,7 @@
         },
 
         render: function () {
-            var self = this;
+            const self = this;
 
             // Prevent re-rendering if data hasn't been fetched
             if (!this.dataFetched) return;
@@ -414,26 +414,26 @@
         },
 
         showActiveContainer: function () {
-            var activeNavigationEl = this.$el.find('.navigation li[data-container-name].active');
-            var containerName = activeNavigationEl.data('container-name');
-            var containerEl = this.$el.find('[data-container="' + containerName + '"]');
+            let activeNavigationEl = this.$el.find('.navigation li[data-container-name].active');
+            let containerName = activeNavigationEl.data('container-name');
+            let containerEl = this.$el.find('[data-container="' + containerName + '"]');
             containerEl.siblings('[data-container]').hide();
             containerEl.show();
         },
 
         createComments: function () {
-            var self = this;
+            const self = this;
 
             // Create the list element before appending to DOM in order to reach better performance
             this.$el.find('#comment-list').remove();
-            var commentList = $('<ul/>', {
+            let commentList = $('<ul/>', {
                 id: 'comment-list',
                 'class': 'main'
             });
 
             // Divide commments into main level comments and replies
-            var mainLevelComments = [];
-            var replies = [];
+            let mainLevelComments = [];
+            let replies = [];
             $(this.getComments()).each(function (index, commentModel) {
                 if (commentModel.parent == null) {
                     mainLevelComments.push(commentModel);
@@ -460,16 +460,16 @@
         },
 
         createAttachments: function () {
-            var self = this;
+            const self = this;
 
             // Create the list element before appending to DOM in order to reach better performance
             this.$el.find('#attachment-list').remove();
-            var attachmentList = $('<ul/>', {
+            let attachmentList = $('<ul/>', {
                 id: 'attachment-list',
                 'class': 'main'
             });
 
-            var attachments = this.getAttachments();
+            let attachments = this.getAttachments();
             this.sortComments(attachments, 'newest');
             attachments.reverse();    // Reverse the order as they are prepended to DOM
             $(attachments).each(function (index, commentModel) {
@@ -482,22 +482,22 @@
 
         addComment: function (commentModel, commentList) {
             commentList = commentList || this.$el.find('#comment-list');
-            var commentEl = this.createCommentElement(commentModel);
+            let commentEl = this.createCommentElement(commentModel);
 
             // Case: reply
             if (commentModel.parent) {
-                var directParentEl = commentList.find('.comment[data-id="' + commentModel.parent + '"]');
+                let directParentEl = commentList.find('.comment[data-id="' + commentModel.parent + '"]');
 
                 // Re-render action bar of direct parent element
                 this.reRenderCommentActionBar(commentModel.parent);
 
                 // Force replies into one level only
-                var outerMostParent = directParentEl.parents('.comment').last();
+                let outerMostParent = directParentEl.parents('.comment').last();
                 if (outerMostParent.length == 0) outerMostParent = directParentEl;
 
                 // Append element to DOM
-                var childCommentsEl = outerMostParent.find('.child-comments');
-                var commentingField = childCommentsEl.find('.commenting-field');
+                let childCommentsEl = outerMostParent.find('.child-comments');
+                let commentingField = childCommentsEl.find('.commenting-field');
                 if (commentingField.length) {
                     commentingField.before(commentEl)
                 } else {
@@ -515,32 +515,32 @@
 
         addAttachment: function (commentModel, commentList) {
             commentList = commentList || this.$el.find('#attachment-list');
-            var commentEl = this.createCommentElement(commentModel);
+            let commentEl = this.createCommentElement(commentModel);
             commentList.prepend(commentEl);
         },
 
         removeComment: function (commentId) {
-            var self = this;
-            var commentModel = this.commentsById[commentId];
+            const self = this;
+            let commentModel = this.commentsById[commentId];
 
             // Remove child comments recursively
-            var childComments = this.getChildComments(commentModel.id);
+            let childComments = this.getChildComments(commentModel.id);
             $(childComments).each(function (index, childComment) {
                 self.removeComment(childComment.id);
             });
 
             // Update the child array of outermost parent
             if (commentModel.parent) {
-                var outermostParent = this.getOutermostParent(commentModel.parent);
-                var indexToRemove = outermostParent.childs.indexOf(commentModel.id);
+                let outermostParent = this.getOutermostParent(commentModel.parent);
+                let indexToRemove = outermostParent.childs.indexOf(commentModel.id);
                 outermostParent.childs.splice(indexToRemove, 1);
             }
 
             // Remove the comment from data model
             delete this.commentsById[commentId];
 
-            var commentElements = this.$el.find('li.comment[data-id="' + commentId + '"]');
-            var parentEl = commentElements.parents('li.comment').last();
+            let commentElements = this.$el.find('li.comment[data-id="' + commentId + '"]');
+            let parentEl = commentElements.parents('li.comment').last();
 
             // Remove the element
             commentElements.remove();
@@ -550,19 +550,19 @@
         },
 
         uploadAttachments: function (files, commentingField) {
-            var self = this;
+            const self = this;
             if (!commentingField) commentingField = this.$el.find('.commenting-field.main');
-            var isReply = !commentingField.hasClass('main');
-            var fileCount = files.length;
+            let isReply = !commentingField.hasClass('main');
+            let fileCount = files.length;
 
             if (fileCount) {
-                var uploadButton = commentingField.find('.upload');
-                var textarea = commentingField.find('.textarea');
+                let uploadButton = commentingField.find('.upload');
+                let textarea = commentingField.find('.textarea');
 
                 // Disable upload button and append spinners while request is pending
                 uploadButton.removeClass('enabled');
-                var attachmentListSpinner = this.createSpinner();
-                var commentListSpinner = this.createSpinner();
+                let attachmentListSpinner = this.createSpinner();
+                let commentListSpinner = this.createSpinner();
                 this.$el.find('ul#attachment-list').prepend(attachmentListSpinner);
                 if (isReply) {
                     commentingField.before(commentListSpinner);
@@ -570,9 +570,9 @@
                     this.$el.find('ul#comment-list').prepend(commentListSpinner);
                 }
 
-                var success = function (commentArray) {
+                let success = function (commentArray) {
                     $(commentArray).each(function (index, commentJSON) {
-                        var commentModel = self.createCommentModel(commentJSON);
+                        let commentModel = self.createCommentModel(commentJSON);
                         self.addCommentToDataModel(commentModel);
                         self.addComment(commentModel);
                         self.addAttachment(commentModel);
@@ -590,18 +590,18 @@
                     attachmentListSpinner.remove();
                 };
 
-                var error = function () {
+                let error = function () {
                     // Enable upload button and remove spinners
                     uploadButton.addClass('enabled');
                     commentListSpinner.remove();
                     attachmentListSpinner.remove();
                 };
 
-                var commentArray = [];
+                let commentArray = [];
                 $(files).each(function (index, file) {
 
                     // Create comment JSON
-                    var commentJSON = self.createCommentJSON(textarea);
+                    let commentJSON = self.createCommentJSON(textarea);
                     commentJSON.id += '-' + index;
                     commentJSON.content = '';
                     commentJSON.file = file;
@@ -624,16 +624,16 @@
             // Don't hide replies if maxRepliesVisible is null or undefined
             if (this.options.maxRepliesVisible == null) return;
 
-            var childCommentsEl = parentEl.find('.child-comments');
-            var childComments = childCommentsEl.find('.comment');
-            var toggleAllButton = childCommentsEl.find('li.toggle-all');
+            let childCommentsEl = parentEl.find('.child-comments');
+            let childComments = childCommentsEl.find('.comment');
+            let toggleAllButton = childCommentsEl.find('li.toggle-all');
             childComments.removeClass('hidden-reply');
 
             // Select replies to be hidden
             if (this.options.maxRepliesVisible === 0) {
-                var hiddenReplies = childComments;
+                let hiddenReplies = childComments;
             } else {
-                var hiddenReplies = childComments.slice(0, -this.options.maxRepliesVisible);
+                let hiddenReplies = childComments.slice(0, -this.options.maxRepliesVisible);
             }
 
             // Add identifying class for hidden replies so they can be toggled
@@ -653,10 +653,10 @@
                     toggleAllButton = $('<li/>', {
                         'class': 'toggle-all highlight-font-bold'
                     });
-                    var toggleAllButtonText = $('<span/>', {
+                    let toggleAllButtonText = $('<span/>', {
                         'class': 'text'
                     });
-                    var caret = $('<span/>', {
+                    let caret = $('<span/>', {
                         'class': 'caret'
                     });
 
@@ -675,13 +675,13 @@
         },
 
         sortComments: function (comments, sortKey) {
-            var self = this;
+            const self = this;
 
             // Sort by popularity
             if (sortKey == 'popularity') {
                 comments.sort(function (commentA, commentB) {
-                    var pointsOfA = commentA.childs.length;
-                    var pointsOfB = commentB.childs.length;
+                    let pointsOfA = commentA.childs.length;
+                    let pointsOfB = commentB.childs.length;
 
                     if (self.options.enableUpvoting) {
                         pointsOfA += commentA.upvoteCount;
@@ -693,8 +693,8 @@
 
                     } else {
                         // Return newer if popularity is the same
-                        var createdA = new Date(commentA.created).getTime();
-                        var createdB = new Date(commentB.created).getTime();
+                        let createdA = new Date(commentA.created).getTime();
+                        let createdB = new Date(commentB.created).getTime();
                         return createdB - createdA;
                     }
                 });
@@ -702,8 +702,8 @@
                 // Sort by date
             } else {
                 comments.sort(function (commentA, commentB) {
-                    var createdA = new Date(commentA.created).getTime();
-                    var createdB = new Date(commentB.created).getTime();
+                    let createdA = new Date(commentA.created).getTime();
+                    let createdB = new Date(commentB.created).getTime();
                     if (sortKey == 'oldest') {
                         return createdA - createdB;
                     } else {
@@ -715,8 +715,8 @@
 
         sortUsers: function (users) {
             users.sort(function (a, b) {
-                var nameA = a.fullname.toLowerCase().trim();
-                var nameB = b.fullname.toLowerCase().trim();
+                let nameA = a.fullname.toLowerCase().trim();
+                let nameB = b.fullname.toLowerCase().trim();
                 if (nameA < nameB) return -1;
                 if (nameA > nameB) return 1;
                 return 0;
@@ -724,35 +724,35 @@
         },
 
         sortAndReArrangeComments: function (sortKey) {
-            var commentList = this.$el.find('#comment-list');
+            let commentList = this.$el.find('#comment-list');
 
             // Get main level comments
-            var mainLevelComments = this.getComments().filter(function (commentModel) {
+            let mainLevelComments = this.getComments().filter(function (commentModel) {
                 return !commentModel.parent
             });
             this.sortComments(mainLevelComments, sortKey);
 
             // Rearrange the main level comments
             $(mainLevelComments).each(function (index, commentModel) {
-                var commentEl = commentList.find('> li.comment[data-id=' + commentModel.id + ']');
+                let commentEl = commentList.find('> li.comment[data-id=' + commentModel.id + ']');
                 commentList.append(commentEl);
             });
         },
 
         showActiveSort: function () {
-            var activeElements = this.$el.find('.navigation li[data-sort-key="' + this.currentSortKey + '"]');
+            let activeElements = this.$el.find('.navigation li[data-sort-key="' + this.currentSortKey + '"]');
 
             // Indicate active sort
             this.$el.find('.navigation li').removeClass('active');
             activeElements.addClass('active');
 
             // Update title for dropdown
-            var titleEl = this.$el.find('.navigation .title');
+            let titleEl = this.$el.find('.navigation .title');
             if (this.currentSortKey != 'attachments') {
                 titleEl.addClass('active');
                 titleEl.find('header').html(activeElements.first().html());
             } else {
-                var defaultDropdownEl = this.$el.find('.navigation ul.dropdown').children().first();
+                let defaultDropdownEl = this.$el.find('.navigation ul.dropdown').children().first();
                 titleEl.find('header').html(defaultDropdownEl.html());
             }
 
@@ -774,9 +774,9 @@
         saveOnKeydown: function (ev) {
             // Save comment on cmd/ctrl + enter
             if (ev.keyCode == 13) {
-                var metaKey = ev.metaKey || ev.ctrlKey;
+                let metaKey = ev.metaKey || ev.ctrlKey;
                 if (this.options.postCommentOnEnter || metaKey) {
-                    var el = $(ev.currentTarget);
+                    let el = $(ev.currentTarget);
                     el.siblings('.control-row').find('.save').trigger('click');
                     ev.stopPropagation();
                     ev.preventDefault();
@@ -785,12 +785,12 @@
         },
 
         saveEditableContent: function (ev) {
-            var el = $(ev.currentTarget);
+            let el = $(ev.currentTarget);
             el.data('before', el.html());
         },
 
         checkEditableContentForChange: function (ev) {
-            var el = $(ev.currentTarget);
+            let el = $(ev.currentTarget);
             if (el.data('before') != el.html()) {
                 el.data('before', el.html());
                 el.trigger('change');
@@ -798,8 +798,8 @@
         },
 
         navigationElementClicked: function (ev) {
-            var navigationEl = $(ev.currentTarget);
-            var sortKey = navigationEl.data().sortKey;
+            let navigationEl = $(ev.currentTarget);
+            let sortKey = navigationEl.data().sortKey;
 
             // Sort the comments if necessary
             if (sortKey != 'attachments') {
@@ -815,21 +815,21 @@
             // Prevent closing immediately
             ev.stopPropagation();
 
-            var dropdown = $(ev.currentTarget).find('~ .dropdown');
+            let dropdown = $(ev.currentTarget).find('~ .dropdown');
             dropdown.toggle();
         },
 
         showMainCommentingField: function (ev) {
-            var mainTextarea = $(ev.currentTarget);
+            let mainTextarea = $(ev.currentTarget);
             mainTextarea.siblings('.control-row').show();
             mainTextarea.parent().find('.close').show();
             mainTextarea.focus();
         },
 
         hideMainCommentingField: function (ev) {
-            var closeButton = $(ev.currentTarget);
-            var mainTextarea = this.$el.find('.commenting-field.main .textarea');
-            var mainControlRow = this.$el.find('.commenting-field.main .control-row');
+            let closeButton = $(ev.currentTarget);
+            let mainTextarea = this.$el.find('.commenting-field.main .textarea');
+            let mainControlRow = this.$el.find('.commenting-field.main .control-row');
 
             this.clearTextarea(mainTextarea);
             this.adjustTextareaHeight(mainTextarea, false);
@@ -840,35 +840,35 @@
         },
 
         increaseTextareaHeight: function (ev) {
-            var textarea = $(ev.currentTarget);
+            let textarea = $(ev.currentTarget);
             this.adjustTextareaHeight(textarea, true);
         },
 
         textareaContentChanged: function (ev) {
-            var textarea = $(ev.currentTarget);
-            var saveButton = textarea.siblings('.control-row').find('.save');
+            let textarea = $(ev.currentTarget);
+            let saveButton = textarea.siblings('.control-row').find('.save');
 
             // Update parent id if reply-to tag was removed
             if (!textarea.find('.reply-to.tag').length) {
-                var commentId = textarea.attr('data-comment');
+                let commentId = textarea.attr('data-comment');
 
                 // Case: editing comment
                 if (commentId) {
-                    var parentComments = textarea.parents('li.comment');
+                    let parentComments = textarea.parents('li.comment');
                     if (parentComments.length > 1) {
-                        var parentId = parentComments.last().data('id');
+                        let parentId = parentComments.last().data('id');
                         textarea.attr('data-parent', parentId);
                     }
 
                     // Case: new comment
                 } else {
-                    var parentId = textarea.parents('li.comment').last().data('id');
+                    let parentId = textarea.parents('li.comment').last().data('id');
                     textarea.attr('data-parent', parentId);
                 }
             }
 
             // Move close button if scrollbar is visible
-            var commentingField = textarea.parents('.commenting-field').first();
+            let commentingField = textarea.parents('.commenting-field').first();
             if (textarea[0].scrollHeight > textarea.outerHeight()) {
                 commentingField.addClass('scrollable');
             } else {
@@ -876,15 +876,15 @@
             }
 
             // Check if content or parent has changed if editing
-            var contentOrParentChangedIfEditing = true;
-            var content = this.getTextareaContent(textarea, true);
+            let contentOrParentChangedIfEditing = true;
+            let content = this.getTextareaContent(textarea, true);
             if (commentId = textarea.attr('data-comment')) {
-                var contentChanged = content != this.commentsById[commentId].content;
-                var parentFromModel;
+                let contentChanged = content != this.commentsById[commentId].content;
+                let parentFromModel;
                 if (this.commentsById[commentId].parent) {
                     parentFromModel = this.commentsById[commentId].parent.toString();
                 }
-                var parentChanged = textarea.attr('data-parent') != parentFromModel;
+                let parentChanged = textarea.attr('data-parent') != parentFromModel;
                 contentOrParentChangedIfEditing = contentChanged || parentChanged;
             }
 
@@ -897,40 +897,40 @@
         },
 
         removeCommentingField: function (ev) {
-            var closeButton = $(ev.currentTarget);
+            let closeButton = $(ev.currentTarget);
 
             // Remove edit class from comment if user was editing the comment
-            var textarea = closeButton.siblings('.textarea');
+            let textarea = closeButton.siblings('.textarea');
             if (textarea.attr('data-comment')) {
                 closeButton.parents('li.comment').first().removeClass('edit');
             }
 
             // Remove the field
-            var commentingField = closeButton.parents('.commenting-field').first();
+            let commentingField = closeButton.parents('.commenting-field').first();
             commentingField.remove();
         },
 
         postComment: function (ev) {
-            var self = this;
-            var sendButton = $(ev.currentTarget);
-            var commentingField = sendButton.parents('.commenting-field').first();
-            var textarea = commentingField.find('.textarea');
+            const self = this;
+            let sendButton = $(ev.currentTarget);
+            let commentingField = sendButton.parents('.commenting-field').first();
+            let textarea = commentingField.find('.textarea');
 
             // Disable send button while request is pending
             sendButton.removeClass('enabled');
 
             // Create comment JSON
-            var commentJSON = this.createCommentJSON(textarea);
+            let commentJSON = this.createCommentJSON(textarea);
 
             // Reverse mapping
             commentJSON = this.applyExternalMappings(commentJSON);
 
-            var success = function (commentJSON) {
+            let success = function (commentJSON) {
                 self.createComment(commentJSON);
                 commentingField.find('.close').trigger('click');
             };
 
-            var error = function () {
+            let error = function () {
                 sendButton.addClass('enabled');
             };
 
@@ -938,22 +938,22 @@
         },
 
         createComment: function (commentJSON) {
-            var commentModel = this.createCommentModel(commentJSON);
+            let commentModel = this.createCommentModel(commentJSON);
             this.addCommentToDataModel(commentModel);
             this.addComment(commentModel);
         },
 
         putComment: function (ev) {
-            var self = this;
-            var saveButton = $(ev.currentTarget);
-            var commentingField = saveButton.parents('.commenting-field').first();
-            var textarea = commentingField.find('.textarea');
+            const self = this;
+            let saveButton = $(ev.currentTarget);
+            let commentingField = saveButton.parents('.commenting-field').first();
+            let textarea = commentingField.find('.textarea');
 
             // Disable send button while request is pending
             saveButton.removeClass('enabled');
 
             // Use a clone of the existing model and update the model after succesfull update
-            var commentJSON = $.extend({}, this.commentsById[textarea.attr('data-comment')]);
+            let commentJSON = $.extend({}, this.commentsById[textarea.attr('data-comment')]);
             $.extend(commentJSON, {
                 parent: textarea.attr('data-parent') || null,
                 content: this.getTextareaContent(textarea),
@@ -964,11 +964,11 @@
             // Reverse mapping
             commentJSON = this.applyExternalMappings(commentJSON);
 
-            var success = function (commentJSON) {
+            let success = function (commentJSON) {
                 // The outermost parent can not be changed by editing the comment so the childs array
                 // of parent does not require an update
 
-                var commentModel = self.createCommentModel(commentJSON);
+                let commentModel = self.createCommentModel(commentJSON);
 
                 // Delete childs array from new comment model since it doesn't need an update
                 delete commentModel['childs'];
@@ -981,7 +981,7 @@
                 self.reRenderComment(commentModel.id);
             };
 
-            var error = function () {
+            let error = function () {
                 saveButton.addClass('enabled');
             };
 
@@ -989,12 +989,12 @@
         },
 
         deleteComment: function (ev) {
-            var self = this;
-            var deleteButton = $(ev.currentTarget);
-            var commentEl = deleteButton.parents('.comment').first();
-            var commentJSON = $.extend({}, this.commentsById[commentEl.attr('data-id')]);
-            var commentId = commentJSON.id;
-            var parentId = commentJSON.parent;
+            const self = this;
+            let deleteButton = $(ev.currentTarget);
+            let commentEl = deleteButton.parents('.comment').first();
+            let commentJSON = $.extend({}, this.commentsById[commentEl.attr('data-id')]);
+            let commentId = commentJSON.id;
+            let parentId = commentJSON.parent;
 
             // Disable send button while request is pending
             deleteButton.removeClass('enabled');
@@ -1002,12 +1002,12 @@
             // Reverse mapping
             commentJSON = this.applyExternalMappings(commentJSON);
 
-            var success = function () {
+            let success = function () {
                 self.removeComment(commentId);
                 if (parentId) self.reRenderCommentActionBar(parentId);
             };
 
-            var error = function () {
+            let error = function () {
                 deleteButton.addClass('enabled');
             };
 
@@ -1015,31 +1015,31 @@
         },
 
         hashtagClicked: function (ev) {
-            var el = $(ev.currentTarget);
-            var value = el.attr('data-value');
+            let el = $(ev.currentTarget);
+            let value = el.attr('data-value');
             this.options.hashtagClicked(value);
         },
 
         pingClicked: function (ev) {
-            var el = $(ev.currentTarget);
-            var value = el.attr('data-value');
+            let el = $(ev.currentTarget);
+            let value = el.attr('data-value');
             this.options.pingClicked(value);
         },
 
         fileInputChanged: function (ev, files) {
-            var files = ev.currentTarget.files;
-            var commentingField = $(ev.currentTarget).parents('.commenting-field').first();
+            let files = ev.currentTarget.files;
+            let commentingField = $(ev.currentTarget).parents('.commenting-field').first();
             this.uploadAttachments(files, commentingField);
         },
 
         upvoteComment: function (ev) {
-            var self = this;
-            var commentEl = $(ev.currentTarget).parents('li.comment').first();
-            var commentModel = commentEl.data().model;
+            const self = this;
+            let commentEl = $(ev.currentTarget).parents('li.comment').first();
+            let commentModel = commentEl.data().model;
 
             // Check whether user upvoted the comment or revoked the upvote
-            var previousUpvoteCount = commentModel.upvoteCount;
-            var newUpvoteCount;
+            let previousUpvoteCount = commentModel.upvoteCount;
+            let newUpvoteCount;
             if (commentModel.userHasUpvoted) {
                 newUpvoteCount = previousUpvoteCount - 1;
             } else {
@@ -1052,16 +1052,16 @@
             this.reRenderUpvotes(commentModel.id);
 
             // Reverse mapping
-            var commentJSON = $.extend({}, commentModel);
+            let commentJSON = $.extend({}, commentModel);
             commentJSON = this.applyExternalMappings(commentJSON);
 
-            var success = function (commentJSON) {
-                var commentModel = self.createCommentModel(commentJSON);
+            let success = function (commentJSON) {
+                let commentModel = self.createCommentModel(commentJSON);
                 self.updateCommentModel(commentModel);
                 self.reRenderUpvotes(commentModel.id);
             };
 
-            var error = function () {
+            let error = function () {
 
                 // Revert changes
                 commentModel.userHasUpvoted = !commentModel.userHasUpvoted;
@@ -1073,21 +1073,21 @@
         },
 
         toggleReplies: function (ev) {
-            var el = $(ev.currentTarget);
+            let el = $(ev.currentTarget);
             el.siblings('.hidden-reply').toggleClass('visible');
             this.setToggleAllButtonText(el, true);
         },
 
         replyButtonClicked: function (ev) {
-            var replyButton = $(ev.currentTarget);
-            var outermostParent = replyButton.parents('li.comment').last();
-            var parentId = replyButton.parents('.comment').first().data().id;
+            let replyButton = $(ev.currentTarget);
+            let outermostParent = replyButton.parents('li.comment').last();
+            let parentId = replyButton.parents('.comment').first().data().id;
 
 
             // Remove existing field
-            var replyField = outermostParent.find('.child-comments > .commenting-field');
+            let replyField = outermostParent.find('.child-comments > .commenting-field');
             if (replyField.length) replyField.remove();
-            var previousParentId = replyField.find('.textarea').attr('data-parent');
+            let previousParentId = replyField.find('.textarea').attr('data-parent');
 
             // Create the reply field (do not re-create)
             if (previousParentId != parentId) {
@@ -1095,32 +1095,32 @@
                 outermostParent.find('.child-comments').append(replyField);
 
                 // Move cursor to end
-                var textarea = replyField.find('.textarea');
+                let textarea = replyField.find('.textarea');
                 this.moveCursorToEnd(textarea)
 
                 // Make sure the reply field will be displayed
-                var scrollTop = this.options.scrollContainer.scrollTop();
-                var endOfReply = scrollTop + replyField.position().top + replyField.outerHeight();
-                var endOfScrollable = scrollTop + this.options.scrollContainer.outerHeight();
+                let scrollTop = this.options.scrollContainer.scrollTop();
+                let endOfReply = scrollTop + replyField.position().top + replyField.outerHeight();
+                let endOfScrollable = scrollTop + this.options.scrollContainer.outerHeight();
                 if (endOfReply > endOfScrollable) {
-                    var newScrollTop = scrollTop + (endOfReply - endOfScrollable);
+                    let newScrollTop = scrollTop + (endOfReply - endOfScrollable);
                     this.options.scrollContainer.scrollTop(newScrollTop);
                 }
             }
         },
 
         editButtonClicked: function (ev) {
-            var editButton = $(ev.currentTarget);
-            var commentEl = editButton.parents('li.comment').first();
-            var commentModel = commentEl.data().model;
+            let editButton = $(ev.currentTarget);
+            let commentEl = editButton.parents('li.comment').first();
+            let commentModel = commentEl.data().model;
             commentEl.addClass('edit');
 
             // Create the editing field
-            var editField = this.createCommentingFieldElement(commentModel.parent, commentModel.id);
+            let editField = this.createCommentingFieldElement(commentModel.parent, commentModel.id);
             commentEl.find('.comment-wrapper').first().append(editField);
 
             // Append original content
-            var textarea = editField.find('.textarea');
+            let textarea = editField.find('.textarea');
             textarea.attr('data-comment', commentModel.id);
 
             // Escaping HTML
@@ -1139,14 +1139,14 @@
         },
 
         handleDragEnter: function (ev) {
-            var count = $(ev.currentTarget).data('dnd-count') || 0;
+            let count = $(ev.currentTarget).data('dnd-count') || 0;
             count++;
             $(ev.currentTarget).data('dnd-count', count);
             $(ev.currentTarget).addClass('drag-over');
         },
 
         handleDragLeave: function (ev, callback) {
-            var count = $(ev.currentTarget).data('dnd-count');
+            let count = $(ev.currentTarget).data('dnd-count');
             count--;
             $(ev.currentTarget).data('dnd-count', count);
 
@@ -1157,7 +1157,7 @@
         },
 
         handleDragLeaveForOverlay: function (ev) {
-            var self = this;
+            const self = this;
             this.handleDragLeave(ev, function () {
                 self.hideDroppableOverlay();
             });
@@ -1198,15 +1198,15 @@
         // =============
 
         createHTML: function () {
-            var self = this;
+            const self = this;
 
             // Commenting field
-            var mainCommentingField = this.createCommentingFieldElement();
+            let mainCommentingField = this.createCommentingFieldElement();
             mainCommentingField.addClass('main');
             this.$el.append(mainCommentingField);
 
             // Hide control row and close button
-            var mainControlRow = mainCommentingField.find('.control-row');
+            let mainControlRow = mainCommentingField.find('.control-row');
             mainControlRow.hide();
             mainCommentingField.find('.close').hide();
 
@@ -1217,22 +1217,22 @@
             }
 
             // Loading spinner
-            var spinner = this.createSpinner();
+            let spinner = this.createSpinner();
             this.$el.append(spinner);
 
             // Comments container
-            var commentsContainer = $('<div/>', {
+            let commentsContainer = $('<div/>', {
                 'class': 'data-container',
                 'data-container': 'comments'
             });
             this.$el.append(commentsContainer);
 
             // "No comments" placeholder
-            var noComments = $('<div/>', {
+            let noComments = $('<div/>', {
                 'class': 'no-comments no-data',
                 text: this.options.textFormatter(this.options.noCommentsText)
             });
-            var noCommentsIcon = $('<i/>', {
+            let noCommentsIcon = $('<i/>', {
                 'class': 'fa fa-comments fa-2x'
             });
             if (this.options.noCommentsIconURL.length) {
@@ -1246,18 +1246,18 @@
             if (this.options.enableAttachments) {
 
                 // Attachments container
-                var attachmentsContainer = $('<div/>', {
+                let attachmentsContainer = $('<div/>', {
                     'class': 'data-container',
                     'data-container': 'attachments'
                 });
                 this.$el.append(attachmentsContainer);
 
                 // "No attachments" placeholder
-                var noAttachments = $('<div/>', {
+                let noAttachments = $('<div/>', {
                     'class': 'no-attachments no-data',
                     text: this.options.textFormatter(this.options.noAttachmentsText)
                 });
-                var noAttachmentsIcon = $('<i/>', {
+                let noAttachmentsIcon = $('<i/>', {
                     'class': 'fa fa-paperclip fa-2x'
                 });
                 if (this.options.attachmentIconURL.length) {
@@ -1269,19 +1269,19 @@
 
 
                 // Drag & dropping attachments
-                var droppableOverlay = $('<div/>', {
+                let droppableOverlay = $('<div/>', {
                     'class': 'droppable-overlay'
                 });
 
-                var droppableContainer = $('<div/>', {
+                let droppableContainer = $('<div/>', {
                     'class': 'droppable-container'
                 });
 
-                var droppable = $('<div/>', {
+                let droppable = $('<div/>', {
                     'class': 'droppable'
                 });
 
-                var uploadIcon = $('<i/>', {
+                let uploadIcon = $('<i/>', {
                     'class': 'fa fa-upload fa-4x'
                 });
                 if (this.options.uploadIconURL.length) {
@@ -1289,7 +1289,7 @@
                     uploadIcon.addClass('image');
                 }
 
-                var dropAttachmentText = $('<div/>', {
+                let dropAttachmentText = $('<div/>', {
                     text: this.options.textFormatter(this.options.attachmentDropText)
                 });
                 droppable.append(uploadIcon);
@@ -1302,11 +1302,11 @@
 
         createProfilePictureElement: function (src) {
             if (src) {
-                var profilePicture = $('<img/>', {
+                let profilePicture = $('<img/>', {
                     src: src
                 });
             } else {
-                var profilePicture = $('<i/>', {
+                let profilePicture = $('<i/>', {
                     'class': 'fa fa-user'
                 });
             }
@@ -1316,33 +1316,33 @@
         },
 
         createCommentingFieldElement: function (parentId, existingCommentId) {
-            var self = this;
+            const self = this;
 
             // Commenting field
-            var commentingField = $('<div/>', {
+            let commentingField = $('<div/>', {
                 'class': 'commenting-field'
             });
 
             // Profile picture
             if (existingCommentId) {
-                var profilePictureURL = this.commentsById[existingCommentId].profilePictureURL;
+                let profilePictureURL = this.commentsById[existingCommentId].profilePictureURL;
             } else {
-                var profilePictureURL = this.options.profilePictureURL;
+                let profilePictureURL = this.options.profilePictureURL;
             }
-            var profilePicture = this.createProfilePictureElement(profilePictureURL);
+            let profilePicture = this.createProfilePictureElement(profilePictureURL);
 
             // New comment
-            var textareaWrapper = $('<div/>', {
+            let textareaWrapper = $('<div/>', {
                 'class': 'textarea-wrapper'
             });
 
             // Control row
-            var controlRow = $('<div/>', {
+            let controlRow = $('<div/>', {
                 'class': 'control-row'
             });
 
             // Textarea
-            var textarea = $('<div/>', {
+            let textarea = $('<div/>', {
                 'class': 'textarea',
                 'data-placeholder': this.options.textFormatter(this.options.textareaPlaceholderText),
                 contenteditable: true
@@ -1352,16 +1352,16 @@
             this.adjustTextareaHeight(textarea, false);
 
             // Close button
-            var closeButton = $('<span/>', {
+            let closeButton = $('<span/>', {
                 'class': 'close'
             }).append($('<span class="left"/>')).append($('<span class="right"/>'));
 
             // Save button text
             if (existingCommentId) {
-                var saveButtonText = this.options.textFormatter(this.options.saveText);
+                let saveButtonText = this.options.textFormatter(this.options.saveText);
 
                 // Delete button
-                var deleteButton = $('<span/>', {
+                let deleteButton = $('<span/>', {
                     'class': 'delete',
                     text: this.options.textFormatter(this.options.deleteText)
                 }).css('background-color', this.options.deleteButtonColor);
@@ -1371,17 +1371,17 @@
                 if (this.isAllowedToDelete(existingCommentId)) deleteButton.addClass('enabled')
 
             } else {
-                var saveButtonText = this.options.textFormatter(this.options.sendText);
+                let saveButtonText = this.options.textFormatter(this.options.sendText);
 
                 // Add upload button if attachments are enabled
                 if (this.options.enableAttachments) {
-                    var uploadButton = $('<span/>', {
+                    let uploadButton = $('<span/>', {
                         'class': 'enabled upload'
                     });
-                    var uploadIcon = $('<i/>', {
+                    let uploadIcon = $('<i/>', {
                         'class': 'fa fa-upload'
                     });
-                    var fileInput = $('<input/>', {
+                    let fileInput = $('<input/>', {
                         type: 'file',
                         'data-role': 'none' // Prevent jquery-mobile for adding classes
                     });
@@ -1399,8 +1399,8 @@
             }
 
             // Save button
-            var saveButtonClass = existingCommentId ? 'update' : 'send';
-            var saveButton = $('<span/>', {
+            let saveButtonClass = existingCommentId ? 'update' : 'send';
+            let saveButton = $('<span/>', {
                 'class': saveButtonClass + ' save highlight-background',
                 text: saveButtonText
             });
@@ -1417,13 +1417,13 @@
                 textarea.attr('data-parent', parentId);
 
                 // Append reply-to tag if necessary
-                var parentModel = this.commentsById[parentId];
+                let parentModel = this.commentsById[parentId];
                 if (parentModel.parent) {
                     textarea.html('&nbsp;');    // Needed to set the cursor to correct place
 
                     // Creating the reply-to tag
-                    var replyToName = '@' + parentModel.fullname;
-                    var replyToTag = this.createTagElement(replyToName, 'reply-to', parentModel.creator);
+                    let replyToName = '@' + parentModel.fullname;
+                    let replyToTag = this.createTagElement(replyToName, 'reply-to', parentModel.creator);
                     textarea.prepend(replyToTag);
                 }
             }
@@ -1436,10 +1436,10 @@
                         term = self.normalizeSpaces(term);
 
                         // Users excluding self and already pinged users
-                        var pings = self.getPings(textarea);
-                        var users = self.getUsers().filter(function (user) {
-                            var isSelf = user.id == self.options.currentUserId;
-                            var alreadyPinged = pings.indexOf(user.id) != -1;
+                        let pings = self.getPings(textarea);
+                        let users = self.getUsers().filter(function (user) {
+                            let isSelf = user.id == self.options.currentUserId;
+                            let alreadyPinged = pings.indexOf(user.id) != -1;
                             return !isSelf && !alreadyPinged;
                         });
 
@@ -1447,26 +1447,26 @@
                         self.sortUsers(users);
 
                         callback($.map(users, function (user) {
-                            var lowercaseTerm = term.toLowerCase();
-                            var nameMatch = user.fullname.toLowerCase().indexOf(lowercaseTerm) != -1;
+                            let lowercaseTerm = term.toLowerCase();
+                            let nameMatch = user.fullname.toLowerCase().indexOf(lowercaseTerm) != -1;
                             return nameMatch ? user : null;
                         }));
                     },
                     template: function (user) {
-                        var wrapper = $('<div/>');
+                        let wrapper = $('<div/>');
 
-                        var profilePictureEl = $('<img/>', {
+                        let profilePictureEl = $('<img/>', {
                             src: user.profile_picture_url,
                             'class': 'profile-picture round'
                         });
-                        var detailsEl = $('<div/>', {
+                        let detailsEl = $('<div/>', {
                             'class': 'details',
                         });
-                        var nameEl = $('<div/>', {
+                        let nameEl = $('<div/>', {
                             'class': 'name',
                         }).html(user.fullname);
 
-                        var emailEl = $('<div/>', {
+                        let emailEl = $('<div/>', {
                             'class': 'email',
                         }).html(user.email);
 
@@ -1481,7 +1481,7 @@
                         return wrapper.html();
                     },
                     replace: function (user) {
-                        var tag = self.createTagElement('@' + user.fullname, 'ping', user.id);
+                        let tag = self.createTagElement('@' + user.fullname, 'ping', user.id);
                         return ' ' + tag[0].outerHTML + ' ';
                     },
                 }], {
@@ -1495,12 +1495,12 @@
                 // OVERIDE TEXTCOMPLETE DROPDOWN POSITIONING
 
                 $.fn.textcomplete.Dropdown.prototype.render = function (zippedData) {
-                    var contentsHtml = this._buildContents(zippedData);
-                    var unzippedData = $.map(zippedData, function (d) {
+                    let contentsHtml = this._buildContents(zippedData);
+                    let unzippedData = $.map(zippedData, function (d) {
                         return d.value;
                     });
                     if (zippedData.length) {
-                        var strategy = zippedData[0].strategy;
+                        let strategy = zippedData[0].strategy;
                         if (strategy.id) {
                             this.$el.attr('data-strategy', strategy.id);
                         } else {
@@ -1525,14 +1525,14 @@
                     // ===========
 
                     // Adjust vertical position
-                    var top = parseInt(this.$el.css('top')) + self.options.scrollContainer.scrollTop();
+                    let top = parseInt(this.$el.css('top')) + self.options.scrollContainer.scrollTop();
                     this.$el.css('top', top);
 
                     // Adjust horizontal position
-                    var originalLeft = this.$el.css('left');
+                    let originalLeft = this.$el.css('left');
                     this.$el.css('left', 0);    // Left must be set to 0 in order to get the real width of the el
-                    var maxLeft = self.$el.width() - this.$el.outerWidth();
-                    var left = Math.min(maxLeft, parseInt(originalLeft));
+                    let maxLeft = self.$el.width() - this.$el.outerWidth();
+                    let left = Math.min(maxLeft, parseInt(originalLeft));
                     this.$el.css('left', left);
 
                     // ===========
@@ -1543,44 +1543,44 @@
         },
 
         createNavigationElement: function () {
-            var navigationEl = $('<ul/>', {
+            let navigationEl = $('<ul/>', {
                 'class': 'navigation'
             });
-            var navigationWrapper = $('<div/>', {
+            let navigationWrapper = $('<div/>', {
                 'class': 'navigation-wrapper'
             });
             navigationEl.append(navigationWrapper);
 
             // Newest
-            var newest = $('<li/>', {
+            let newest = $('<li/>', {
                 text: this.options.textFormatter(this.options.newestText),
                 'data-sort-key': 'newest',
                 'data-container-name': 'comments'
             });
 
             // Oldest
-            var oldest = $('<li/>', {
+            let oldest = $('<li/>', {
                 text: this.options.textFormatter(this.options.oldestText),
                 'data-sort-key': 'oldest',
                 'data-container-name': 'comments'
             });
 
             // Popular
-            var popular = $('<li/>', {
+            let popular = $('<li/>', {
                 text: this.options.textFormatter(this.options.popularText),
                 'data-sort-key': 'popularity',
                 'data-container-name': 'comments'
             });
 
             // Attachments
-            var attachments = $('<li/>', {
+            let attachments = $('<li/>', {
                 text: this.options.textFormatter(this.options.attachmentsText),
                 'data-sort-key': 'attachments',
                 'data-container-name': 'attachments'
             });
 
             // Attachments icon
-            var attachmentsIcon = $('<i/>', {
+            let attachmentsIcon = $('<i/>', {
                 'class': 'fa fa-paperclip'
             });
             if (this.options.attachmentIconURL.length) {
@@ -1591,16 +1591,16 @@
 
 
             // Responsive navigation
-            var dropdownNavigationWrapper = $('<div/>', {
+            let dropdownNavigationWrapper = $('<div/>', {
                 'class': 'navigation-wrapper responsive'
             });
-            var dropdownNavigation = $('<ul/>', {
+            let dropdownNavigation = $('<ul/>', {
                 'class': 'dropdown'
             });
-            var dropdownTitle = $('<li/>', {
+            let dropdownTitle = $('<li/>', {
                 'class': 'title'
             });
-            var dropdownTitleHeader = $('<header/>');
+            let dropdownTitleHeader = $('<header/>');
 
             dropdownTitle.append(dropdownTitleHeader);
             dropdownNavigationWrapper.append(dropdownTitle);
@@ -1626,10 +1626,10 @@
         },
 
         createSpinner: function () {
-            var spinner = $('<div/>', {
+            let spinner = $('<div/>', {
                 'class': 'spinner'
             });
-            var spinnerIcon = $('<i/>', {
+            let spinnerIcon = $('<i/>', {
                 'class': 'fa fa-spinner fa-spin'
             });
             if (this.options.spinnerIconURL.length) {
@@ -1643,7 +1643,7 @@
         createCommentElement: function (commentModel) {
 
             // Comment container element
-            var commentEl = $('<li/>', {
+            let commentEl = $('<li/>', {
                 'data-id': commentModel.id,
                 'class': 'comment'
             }).data('model', commentModel);
@@ -1652,12 +1652,12 @@
             if (commentModel.createdByAdmin) commentEl.addClass('by-admin');
 
             // Child comments
-            var childComments = $('<ul/>', {
+            let childComments = $('<ul/>', {
                 'class': 'child-comments'
             });
 
             // Comment wrapper
-            var commentWrapper = this.createCommentWrapperElement(commentModel);
+            let commentWrapper = this.createCommentWrapperElement(commentModel);
 
             commentEl.append(commentWrapper);
             if (commentModel.parent == null) commentEl.append(childComments);
@@ -1665,26 +1665,26 @@
         },
 
         createCommentWrapperElement: function (commentModel) {
-            var commentWrapper = $('<div/>', {
+            let commentWrapper = $('<div/>', {
                 'class': 'comment-wrapper'
             });
 
             // Profile picture
-            var profilePicture = this.createProfilePictureElement(commentModel.profilePictureURL);
+            let profilePicture = this.createProfilePictureElement(commentModel.profilePictureURL);
 
             // Time
-            var time = $('<time/>', {
+            let time = $('<time/>', {
                 text: this.options.timeFormatter(commentModel.created),
                 'data-original': commentModel.created
             });
 
             // Name
-            var nameText = commentModel.createdByCurrentUser ? this.options.textFormatter(this.options.youText) : commentModel.fullname;
-            var name = $('<div/>', {
+            let nameText = commentModel.createdByCurrentUser ? this.options.textFormatter(this.options.youText) : commentModel.fullname;
+            let name = $('<div/>', {
                 'class': 'name'
             });
             if (commentModel.profileURL) {
-                var link = $('<a/>', {
+                let link = $('<a/>', {
                     href: commentModel.profileURL,
                     text: nameText
                 });
@@ -1698,15 +1698,15 @@
 
             // Show reply-to name if parent of parent exists
             if (commentModel.parent) {
-                var parent = this.commentsById[commentModel.parent];
+                let parent = this.commentsById[commentModel.parent];
                 if (parent.parent) {
-                    var replyTo = $('<span/>', {
+                    let replyTo = $('<span/>', {
                         'class': 'reply-to',
                         text: parent.fullname
                     });
 
                     // reply icon
-                    var replyIcon = $('<i/>', {
+                    let replyIcon = $('<i/>', {
                         'class': 'fa fa-share'
                     });
                     if (this.options.replyIconURL.length) {
@@ -1721,7 +1721,7 @@
 
             // New tag
             if (commentModel.isNew) {
-                var newTag = $('<span/>', {
+                let newTag = $('<span/>', {
                     'class': 'new highlight-background',
                     text: this.options.newText
                 });
@@ -1729,24 +1729,24 @@
             }
 
             // Wrapper
-            var wrapper = $('<div/>', {
+            let wrapper = $('<div/>', {
                 'class': 'wrapper'
             });
 
             // Content
-            var content = $('<div/>', {
+            let content = $('<div/>', {
                 'class': 'content'
             });
 
             // Case: attachment
-            var isAttachment = commentModel.fileURL != undefined;
+            let isAttachment = commentModel.fileURL != undefined;
             if (isAttachment) {
-                var format = null;
-                var type = null;
+                let format = null;
+                let type = null;
 
                 // Type and format
                 if (commentModel.fileMimeType) {
-                    var mimeTypeParts = commentModel.fileMimeType.split('/');
+                    let mimeTypeParts = commentModel.fileMimeType.split('/');
                     if (mimeTypeParts.length == 2) {
                         format = mimeTypeParts[1];
                         type = mimeTypeParts[0];
@@ -1754,7 +1754,7 @@
                 }
 
                 // Attachment link
-                var link = $('<a/>', {
+                let link = $('<a/>', {
                     'class': 'attachment',
                     href: commentModel.fileURL,
                     target: '_blank'
@@ -1762,14 +1762,14 @@
 
                 // Case: image preview
                 if (type == 'image') {
-                    var image = $('<img/>', {
+                    let image = $('<img/>', {
                         src: commentModel.fileURL
                     });
                     link.html(image);
 
                     // Case: video preview
                 } else if (type == 'video') {
-                    var video = $('<video/>', {
+                    let video = $('<video/>', {
                         src: commentModel.fileURL,
                         type: commentModel.fileMimeType,
                         controls: 'controls'
@@ -1780,17 +1780,17 @@
                 } else {
 
                     // Icon
-                    var availableIcons = ['archive', 'audio', 'code', 'excel', 'image', 'movie', 'pdf', 'photo',
+                    let availableIcons = ['archive', 'audio', 'code', 'excel', 'image', 'movie', 'pdf', 'photo',
                         'picture', 'powerpoint', 'sound', 'video', 'word', 'zip'];
 
-                    var iconClass = 'fa fa-file-o';
+                    let iconClass = 'fa fa-file-o';
                     if (availableIcons.indexOf(format) > 0) {
                         iconClass = 'fa fa-file-' + format + '-o';
                     } else if (availableIcons.indexOf(type) > 0) {
                         iconClass = 'fa fa-file-' + type + '-o';
                     }
 
-                    var fileIcon = $('<i/>', {
+                    let fileIcon = $('<i/>', {
                         'class': iconClass
                     });
                     if (this.options.fileIconURL.length) {
@@ -1799,8 +1799,8 @@
                     }
 
                     // File name
-                    var parts = commentModel.fileURL.split('/');
-                    var fileName = parts[parts.length - 1];
+                    let parts = commentModel.fileURL.split('/');
+                    let fileName = parts[parts.length - 1];
                     fileName = fileName.split('?')[0];
                     fileName = decodeURIComponent(fileName);
 
@@ -1816,8 +1816,8 @@
 
             // Edited timestamp
             if (commentModel.modified && commentModel.modified != commentModel.created) {
-                var editedTime = this.options.timeFormatter(commentModel.modified);
-                var edited = $('<time/>', {
+                let editedTime = this.options.timeFormatter(commentModel.modified);
+                let edited = $('<time/>', {
                     'class': 'edited',
                     text: this.options.textFormatter(this.options.editedText) + ' ' + editedTime,
                     'data-original': commentModel.modified
@@ -1826,25 +1826,25 @@
             }
 
             // Actions
-            var actions = $('<span/>', {
+            let actions = $('<span/>', {
                 'class': 'actions'
             });
 
             // Separator
-            var separator = $('<span/>', {
+            let separator = $('<span/>', {
                 'class': 'separator',
                 text: '·'
             });
 
             // Reply
-            var reply = $('<button/>', {
+            let reply = $('<button/>', {
                 'class': 'action reply',
                 'type': 'button',
                 text: this.options.textFormatter(this.options.replyText)
             });
 
             // Upvote icon
-            var upvoteIcon = $('<i/>', {
+            let upvoteIcon = $('<i/>', {
                 'class': 'fa fa-thumbs-up'
             });
             if (this.options.upvoteIconURL.length) {
@@ -1853,7 +1853,7 @@
             }
 
             // Upvotes
-            var upvotes = this.createUpvoteElement(commentModel);
+            let upvotes = this.createUpvoteElement(commentModel);
 
             // Append buttons for actions that are enabled
             if (this.options.enableReplying) actions.append(reply);
@@ -1863,7 +1863,7 @@
 
                 // Case: delete button for attachment
                 if (isAttachment && this.isAllowedToDelete(commentModel.id)) {
-                    var deleteButton = $('<button/>', {
+                    let deleteButton = $('<button/>', {
                         'class': 'action delete enabled',
                         text: this.options.textFormatter(this.options.deleteText)
                     });
@@ -1871,7 +1871,7 @@
 
                     // Case: edit button for regular comment
                 } else if (!isAttachment && this.options.enableEditing) {
-                    var editButton = $('<button/>', {
+                    let editButton = $('<button/>', {
                         'class': 'action edit',
                         text: this.options.textFormatter(this.options.editText)
                     });
@@ -1894,7 +1894,7 @@
 
         createUpvoteElement: function (commentModel) {
             // Upvote icon
-            var upvoteIcon = $('<i/>', {
+            let upvoteIcon = $('<i/>', {
                 'class': 'fa fa-thumbs-up'
             });
             if (this.options.upvoteIconURL.length) {
@@ -1903,7 +1903,7 @@
             }
 
             // Upvotes
-            var upvoteEl = $('<button/>', {
+            let upvoteEl = $('<button/>', {
                 'class': 'action upvote' + (commentModel.userHasUpvoted ? ' highlight-font' : '')
             }).append($('<span/>', {
                 text: commentModel.upvoteCount,
@@ -1914,7 +1914,7 @@
         },
 
         createTagElement: function (text, extraClasses, value) {
-            var tagEl = $('<input/>', {
+            let tagEl = $('<input/>', {
                 'class': 'tag',
                 'type': 'button',
                 'data-role': 'none',
@@ -1926,34 +1926,34 @@
         },
 
         reRenderComment: function (id) {
-            var commentModel = this.commentsById[id];
-            var commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
+            let commentModel = this.commentsById[id];
+            let commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
 
-            var self = this;
+            const self = this;
             commentElements.each(function (index, commentEl) {
-                var commentWrapper = self.createCommentWrapperElement(commentModel);
+                let commentWrapper = self.createCommentWrapperElement(commentModel);
                 $(commentEl).find('.comment-wrapper').first().replaceWith(commentWrapper);
             });
         },
 
         reRenderCommentActionBar: function (id) {
-            var commentModel = this.commentsById[id];
-            var commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
+            let commentModel = this.commentsById[id];
+            let commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
 
-            var self = this;
+            const self = this;
             commentElements.each(function (index, commentEl) {
-                var commentWrapper = self.createCommentWrapperElement(commentModel);
+                let commentWrapper = self.createCommentWrapperElement(commentModel);
                 $(commentEl).find('.actions').first().replaceWith(commentWrapper.find('.actions'));
             });
         },
 
         reRenderUpvotes: function (id) {
-            var commentModel = this.commentsById[id];
-            var commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
+            let commentModel = this.commentsById[id];
+            let commentElements = this.$el.find('li.comment[data-id="' + commentModel.id + '"]');
 
-            var self = this;
+            const self = this;
             commentElements.each(function (index, commentEl) {
-                var upvotes = self.createUpvoteElement(commentModel);
+                let upvotes = self.createUpvoteElement(commentModel);
                 $(commentEl).find('.upvote').first().replaceWith(upvotes);
             });
         },
@@ -1993,7 +1993,7 @@
         },
 
         createCss: function (css) {
-            var styleEl = $('<style/>', {
+            let styleEl = $('<style/>', {
                 type: 'text/css',
                 'class': 'jquery-comments-css',
                 text: css
@@ -2006,14 +2006,14 @@
         // =========
 
         getComments: function () {
-            var self = this;
+            const self = this;
             return Object.keys(this.commentsById).map(function (id) {
                 return self.commentsById[id]
             });
         },
 
         getUsers: function () {
-            var self = this;
+            const self = this;
             return Object.keys(this.usersById).map(function (id) {
                 return self.usersById[id]
             });
@@ -2032,17 +2032,17 @@
         },
 
         getOutermostParent: function (directParentId) {
-            var parentId = directParentId;
+            let parentId = directParentId;
             do {
-                var parentComment = this.commentsById[parentId];
+                let parentComment = this.commentsById[parentId];
                 parentId = parentComment.parent;
             } while (parentComment.parent != null);
             return parentComment;
         },
 
         createCommentJSON: function (textarea) {
-            var time = new Date().toISOString();
-            var commentJSON = {
+            let time = new Date().toISOString();
+            let commentJSON = {
                 id: 'c' + (this.getComments().length + 1),   // Temporary id
                 parent: textarea.attr('data-parent') || null,
                 created: time,
@@ -2060,7 +2060,7 @@
 
         isAllowedToDelete: function (commentId) {
             if (this.options.enableDeleting) {
-                var isAllowedToDelete = true;
+                let isAllowedToDelete = true;
                 if (!this.options.enableDeletingCommentWithReplies) {
                     $(this.getComments()).each(function (index, comment) {
                         if (comment.parent == commentId) isAllowedToDelete = false;
@@ -2072,18 +2072,18 @@
         },
 
         setToggleAllButtonText: function (toggleAllButton, toggle) {
-            var self = this;
-            var textContainer = toggleAllButton.find('span.text');
-            var caret = toggleAllButton.find('.caret');
+            const self = this;
+            let textContainer = toggleAllButton.find('span.text');
+            let caret = toggleAllButton.find('.caret');
 
-            var showExpandingText = function () {
-                var text = self.options.textFormatter(self.options.viewAllRepliesText);
-                var replyCount = toggleAllButton.siblings('.comment').length;
+            let showExpandingText = function () {
+                let text = self.options.textFormatter(self.options.viewAllRepliesText);
+                let replyCount = toggleAllButton.siblings('.comment').length;
                 text = text.replace('__replyCount__', replyCount);
                 textContainer.text(text);
             };
 
-            var hideRepliesText = this.options.textFormatter(this.options.hideRepliesText);
+            let hideRepliesText = this.options.textFormatter(this.options.hideRepliesText);
 
             if (toggle) {
 
@@ -2106,21 +2106,21 @@
         },
 
         adjustTextareaHeight: function (textarea, focus) {
-            var textareaBaseHeight = 2.2;
-            var lineHeight = 1.45;
+            let textareaBaseHeight = 2.2;
+            let lineHeight = 1.45;
 
-            var setRows = function (rows) {
-                var height = textareaBaseHeight + (rows - 1) * lineHeight;
+            let setRows = function (rows) {
+                let height = textareaBaseHeight + (rows - 1) * lineHeight;
                 textarea.css('height', height + 'em');
             };
 
             textarea = $(textarea);
-            var rowCount = focus == true ? this.options.textareaRowsOnFocus : this.options.textareaRows;
+            let rowCount = focus == true ? this.options.textareaRowsOnFocus : this.options.textareaRows;
             do {
                 setRows(rowCount);
                 rowCount++;
-                var isAreaScrollable = textarea[0].scrollHeight > textarea.outerHeight();
-                var maxRowsUsed = this.options.textareaMaxRows == false ?
+                let isAreaScrollable = textarea[0].scrollHeight > textarea.outerHeight();
+                let maxRowsUsed = this.options.textareaMaxRows == false ?
                     false : rowCount > this.options.textareaMaxRows;
             } while (isAreaScrollable && !maxRowsUsed);
         },
@@ -2130,7 +2130,7 @@
         },
 
         getTextareaContent: function (textarea, humanReadable) {
-            var textareaClone = textarea.clone();
+            let textareaClone = textarea.clone();
 
             // Remove reply-to tag
             textareaClone.find('.reply-to.tag').remove();
@@ -2143,21 +2143,21 @@
                 return humanReadable ? $(this).val() : '@' + $(this).attr('data-value');
             });
 
-            var ce = $('<pre/>').html(textareaClone.html());
+            let ce = $('<pre/>').html(textareaClone.html());
             ce.find('div, p, br').replaceWith(function () {
                 return '\n' + this.innerHTML;
             });
 
             // Trim leading spaces
-            var text = ce.text().replace(/^\s+/g, '');
+            let text = ce.text().replace(/^\s+/g, '');
 
             // Normalize spaces
-            var text = this.normalizeSpaces(text);
+            let text = this.normalizeSpaces(text);
             return text;
         },
 
         getFormattedCommentContent: function (commentModel, replaceNewLines) {
-            var html = this.escape(commentModel.content);
+            let html = this.escape(commentModel.content);
             html = this.linkify(html);
             html = this.highlightTags(commentModel, html);
             if (replaceNewLines) html = html.replace(/(?:\n)/g, '<br>');
@@ -2181,14 +2181,14 @@
 
             // Move cursor to end
             if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
-                var range = document.createRange();
+                let range = document.createRange();
                 range.selectNodeContents(el);
                 range.collapse(false);
-                var sel = window.getSelection();
+                let sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(range);
             } else if (typeof document.body.createTextRange != 'undefined') {
-                var textRange = document.body.createTextRange();
+                let textRange = document.body.createTextRange();
                 textRange.moveToElementText(el);
                 textRange.collapse(false);
                 textRange.select();
@@ -2207,7 +2207,7 @@
         },
 
         after: function (times, func) {
-            var self = this;
+            const self = this;
             return function () {
                 times--;
                 if (times == 0) {
@@ -2223,16 +2223,16 @@
         },
 
         highlightHashtags: function (commentModel, html) {
-            var self = this;
+            const self = this;
 
             if (html.indexOf('#') != -1) {
 
-                var __createTag = function (tag) {
-                    var tag = self.createTagElement('#' + tag, 'hashtag', tag);
+                let __createTag = function (tag) {
+                    let tag = self.createTagElement('#' + tag, 'hashtag', tag);
                     return tag[0].outerHTML;
                 }
 
-                var regex = /(^|\s)#([a-zäöüß\d-_]+)/gim;
+                let regex = /(^|\s)#([a-zäöüß\d-_]+)/gim;
                 html = html.replace(regex, function ($0, $1, $2) {
                     return $1 + __createTag($2);
                 });
@@ -2241,23 +2241,23 @@
         },
 
         highlightPings: function (commentModel, html) {
-            var self = this;
+            const self = this;
 
             if (html.indexOf('@') != -1) {
 
-                var __createTag = function (user) {
-                    var tag = self.createTagElement('@' + user.fullname, 'ping', user.id);
+                let __createTag = function (user) {
+                    let tag = self.createTagElement('@' + user.fullname, 'ping', user.id);
                     return tag[0].outerHTML;
                 }
 
-                var highlightedHtml = '';
+                let highlightedHtml = '';
                 $(commentModel.pings).each(function (index, id) {
                     if (id in self.usersById) {
-                        var user = self.usersById[id];
-                        var pingText = '@' + user.fullname;
+                        let user = self.usersById[id];
+                        let pingText = '@' + user.fullname;
 
-                        var endIndex = html.indexOf(pingText) + pingText.length;
-                        var current = html.slice(0, endIndex);
+                        let endIndex = html.indexOf(pingText) + pingText.length;
+                        let current = html.slice(0, endIndex);
                         highlightedHtml += current.replace(pingText, __createTag(user));
 
                         html = html.slice(endIndex);
@@ -2270,7 +2270,7 @@
         },
 
         linkify: function (inputText) {
-            var replacedText, replacePattern1, replacePattern2, replacePattern3;
+            let replacedText, replacePattern1, replacePattern2, replacePattern3;
 
             // URLs starting with http://, https://, file:// or ftp://
             replacePattern1 = /(^|\s)((https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
@@ -2286,17 +2286,17 @@
 
             // If there are hrefs in the original text, let's split
             // the text up and only work on the parts that don't have urls yet.
-            var count = inputText.match(/<a href/g) || [];
+            let count = inputText.match(/<a href/g) || [];
 
             if (count.length > 0) {
                 // Keep delimiter when splitting
-                var splitInput = inputText.split(/(<\/a>)/g);
-                for (var i = 0; i < splitInput.length; i++) {
+                let splitInput = inputText.split(/(<\/a>)/g);
+                for (let i = 0; i < splitInput.length; i++) {
                     if (splitInput[i].match(/<a href/g) == null) {
                         splitInput[i] = splitInput[i].replace(replacePattern1, '<a href="$1" target="_blank">$1</a>').replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>').replace(replacePattern3, '<a href="mailto:$1">$1</a>');
                     }
                 }
-                var combinedReplacedText = splitInput.join('');
+                let combinedReplacedText = splitInput.join('');
                 return combinedReplacedText;
             } else {
                 return replacedText;
@@ -2304,7 +2304,7 @@
         },
 
         waitUntil: function (condition, callback) {
-            var self = this;
+            const self = this;
 
             if (condition()) {
                 callback();
@@ -2318,9 +2318,9 @@
         applyInternalMappings: function (commentJSON) {
 
             // Inverting field mappings
-            var invertedMappings = {};
-            var mappings = this.options.fieldMappings;
-            for (var prop in mappings) {
+            let invertedMappings = {};
+            let mappings = this.options.fieldMappings;
+            for (let prop in mappings) {
                 if (mappings.hasOwnProperty(prop)) {
                     invertedMappings[mappings[prop]] = prop;
                 }
@@ -2330,16 +2330,16 @@
         },
 
         applyExternalMappings: function (commentJSON) {
-            var mappings = this.options.fieldMappings;
+            let mappings = this.options.fieldMappings;
             return this.applyMappings(mappings, commentJSON);
         },
 
         applyMappings: function (mappings, commentJSON) {
-            var result = {};
+            let result = {};
 
-            for (var key1 in commentJSON) {
+            for (let key1 in commentJSON) {
                 if (key1 in mappings) {
-                    var key2 = mappings[key1];
+                    let key2 = mappings[key1];
                     result[key2] = commentJSON[key1];
                 }
             }
@@ -2350,7 +2350,7 @@
 
     $.fn.comments = function (options) {
         return this.each(function () {
-            var comments = Object.create(Comments);
+            let comments = Object.create(Comments);
             $.data(this, 'comments', comments);
             comments.init(options || {}, this);
         });
